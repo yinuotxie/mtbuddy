@@ -8,8 +8,16 @@ import sys
 from pathlib import Path
 
 from .core.executor import LocalExecutor
-from .integrations.agent_clients import FunctionRouterAgentClient, OpenClawAgentClient
+from .integrations.agent_clients import (
+    FUNCTION_ROUTER_CLIENT_NAME,
+    OPENCLAW_CLIENT_NAME,
+    FunctionRouterAgentClient,
+    OpenClawAgentClient,
+)
 from .integrations.agent_executor import AgentExecutor
+
+
+LOCAL_EXECUTOR_NAME = "local"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -35,8 +43,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run_parser.add_argument(
         "--executor",
-        choices=("local", "openclaw", "function-router"),
-        default="local",
+        choices=(LOCAL_EXECUTOR_NAME, OPENCLAW_CLIENT_NAME, FUNCTION_ROUTER_CLIENT_NAME),
+        default=LOCAL_EXECUTOR_NAME,
         help=(
             "Execution backend. Use local for deterministic tests, openclaw for the "
             "flagship agent path, or function-router for direct MTClaw/OpenAI-compatible calls."
@@ -79,10 +87,10 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _build_executor(name: str):
-    if name == "local":
+    if name == LOCAL_EXECUTOR_NAME:
         return LocalExecutor()
-    if name == "openclaw":
+    if name == OPENCLAW_CLIENT_NAME:
         return AgentExecutor(OpenClawAgentClient())
-    if name == "function-router":
+    if name == FUNCTION_ROUTER_CLIENT_NAME:
         return AgentExecutor(FunctionRouterAgentClient())
     raise ValueError(f"unknown executor: {name}")

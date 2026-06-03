@@ -5,14 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..core.interfaces import RunResult
-from .agent_clients import OpenClawAgentClient
+from .agent_clients import OPENCLAW_CLIENT_NAME, OpenClawAgentClient
 from .agent_executor import AgentExecutor
 
 
 class OpenClawExecutor:
     """Backward-compatible executor wrapper around ``OpenClawAgentClient``."""
 
-    name = "openclaw"
+    name = OPENCLAW_CLIENT_NAME
 
     def __init__(self, openclaw_bin: str = "openclaw", agent_name: str = "mtbuddy") -> None:
         self._executor = AgentExecutor(

@@ -16,6 +16,14 @@ from typing import Any
 from ..core.workspace import resolve_workspace
 
 
+OPENCLAW_CLIENT_NAME = "openclaw"
+FUNCTION_ROUTER_CLIENT_NAME = "function-router"
+FUNCTION_ROUTER_DEFAULT_MODEL = "function_router/function-router"
+FUNCTION_ROUTER_BASE_URL_ENV = "MTBUDDY_FUNCTION_ROUTER_BASE_URL"
+FUNCTION_ROUTER_MODEL_ENV = "MTBUDDY_FUNCTION_ROUTER_MODEL"
+FUNCTION_ROUTER_API_KEY_ENV = "MTBUDDY_FUNCTION_ROUTER_API_KEY"
+
+
 @dataclass(frozen=True)
 class AgentRunResponse:
     """Normalized response from an agent/client run."""
@@ -53,7 +61,7 @@ class OpenAICompatibleAgentClient(ABC):
 class FunctionRouterAgentClient(OpenAICompatibleAgentClient):
     """Direct OpenAI-compatible client for MTClaw Function Router."""
 
-    name = "function-router"
+    name = FUNCTION_ROUTER_CLIENT_NAME
 
     def __init__(
         self,
@@ -63,16 +71,20 @@ class FunctionRouterAgentClient(OpenAICompatibleAgentClient):
         api_key: str | None = None,
         timeout_s: float = 60.0,
     ) -> None:
-        self.base_url = (base_url or os.environ.get("MTBUDDY_FUNCTION_ROUTER_BASE_URL") or "").rstrip("/")
-        self.model = model or os.environ.get("MTBUDDY_FUNCTION_ROUTER_MODEL") or "function_router/function-router"
-        self.api_key = api_key if api_key is not None else os.environ.get("MTBUDDY_FUNCTION_ROUTER_API_KEY", "")
+        self.base_url = (base_url or os.environ.get(FUNCTION_ROUTER_BASE_URL_ENV) or "").rstrip("/")
+        self.model = model or os.environ.get(FUNCTION_ROUTER_MODEL_ENV) or FUNCTION_ROUTER_DEFAULT_MODEL
+        self.api_key = (
+            api_key
+            if api_key is not None
+            else os.environ.get(FUNCTION_ROUTER_API_KEY_ENV, "")
+        )
         self.timeout_s = timeout_s
 
     def run_workspace_task(self, workspace: Path, request: str) -> AgentRunResponse:
         if not self.base_url:
             raise RuntimeError(
                 "MTClaw Function Router base URL is not configured. Set "
-                "MTBUDDY_FUNCTION_ROUTER_BASE_URL, for example http://127.0.0.1:18790/v1."
+                f"{FUNCTION_ROUTER_BASE_URL_ENV}, for example http://127.0.0.1:18790/v1."
             )
         message = self.build_workspace_message(workspace, request)
         payload = {
@@ -116,7 +128,7 @@ class FunctionRouterAgentClient(OpenAICompatibleAgentClient):
 class OpenClawAgentClient(OpenAICompatibleAgentClient):
     """OpenClaw CLI client configured to use MTClaw as an OpenAI-compatible provider."""
 
-    name = "openclaw"
+    name = OPENCLAW_CLIENT_NAME
 
     def __init__(self, openclaw_bin: str = "openclaw", agent_name: str = "mtbuddy") -> None:
         self.openclaw_bin = openclaw_bin
