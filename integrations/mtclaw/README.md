@@ -1,13 +1,16 @@
 # MTBUDDY MTClaw Integration
 
 This directory contains Function Router tool definitions and wrappers for
-running MTBUDDY workspace operations through MTClaw.
+running MTBUDDY workspace operations through MTClaw. Any OpenAI-compatible
+agent/client can use these tools by pointing its `base_url` at MTClaw Function
+Router.
 
 MTBUDDY uses this stack for the competition demo:
 
 ```text
 MTBUDDY workstation UI or CLI
-  -> OpenClaw agent runtime
+  -> OpenAI-compatible agent client
+       -> OpenClaw, Hermes, OpenCode, Codex-like clients
   -> MTClaw Function Router provider
   -> DeepSeek or AIBOOK local model endpoint
   -> MTBUDDY workspace tools

@@ -8,7 +8,8 @@ import sys
 from pathlib import Path
 
 from .core.executor import LocalExecutor
-from .integrations.openclaw import OpenClawExecutor
+from .integrations.agent_clients import FunctionRouterAgentClient, OpenClawAgentClient
+from .integrations.agent_executor import AgentExecutor
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,9 +35,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run_parser.add_argument(
         "--executor",
-        choices=("local", "openclaw"),
+        choices=("local", "openclaw", "function-router"),
         default="local",
-        help="Execution backend. Use local for deterministic tests; openclaw for the competition stack.",
+        help=(
+            "Execution backend. Use local for deterministic tests, openclaw for the "
+            "flagship agent path, or function-router for direct MTClaw/OpenAI-compatible calls."
+        ),
     )
     run_parser.add_argument(
         "--json",
@@ -52,11 +56,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "run":
-        executor = (
-            LocalExecutor()
-            if args.executor == "local"
-            else OpenClawExecutor()
-        )
+        executor = _build_executor(args.executor)
         try:
             result = executor.run(args.workspace, args.request)
         except Exception as exc:  # pragma: no cover - exercised through CLI e2e
@@ -76,3 +76,13 @@ def main(argv: list[str] | None = None) -> int:
 
     parser.error(f"unknown command: {args.command}")
     return 2
+
+
+def _build_executor(name: str):
+    if name == "local":
+        return LocalExecutor()
+    if name == "openclaw":
+        return AgentExecutor(OpenClawAgentClient())
+    if name == "function-router":
+        return AgentExecutor(FunctionRouterAgentClient())
+    raise ValueError(f"unknown executor: {name}")

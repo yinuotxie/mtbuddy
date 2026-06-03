@@ -57,7 +57,7 @@ def test_cli_run_creates_report_action_csv_and_audit_log(tmp_path: Path) -> None
         "## Audit Trail",
     ):
         assert section in report
-    assert "OpenClaw as the agent runtime" in report
+    assert "OpenClaw, Hermes, OpenCode, and Codex-like OpenAI-compatible agents" in report
     assert "MTClaw Function Router" in report
 
     with action_items_path.open(encoding="utf-8", newline="") as handle:

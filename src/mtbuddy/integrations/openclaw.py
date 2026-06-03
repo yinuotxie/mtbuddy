@@ -1,66 +1,23 @@
-"""OpenClaw executor seam for the competition runtime."""
+"""OpenClaw compatibility exports."""
 
 from __future__ import annotations
 
-import json
-import shutil
-import subprocess
 from pathlib import Path
 
 from ..core.interfaces import RunResult
-from ..core.workspace import resolve_workspace
+from .agent_clients import OpenClawAgentClient
+from .agent_executor import AgentExecutor
 
 
 class OpenClawExecutor:
-    """Run a task through OpenClaw, configured to use MTClaw as provider."""
+    """Backward-compatible executor wrapper around ``OpenClawAgentClient``."""
 
     name = "openclaw"
 
-    def __init__(self, openclaw_bin: str = "openclaw") -> None:
-        self._openclaw_bin = openclaw_bin
+    def __init__(self, openclaw_bin: str = "openclaw", agent_name: str = "mtbuddy") -> None:
+        self._executor = AgentExecutor(
+            OpenClawAgentClient(openclaw_bin=openclaw_bin, agent_name=agent_name)
+        )
 
     def run(self, workspace: Path, request: str) -> RunResult:
-        resolved_workspace = resolve_workspace(workspace)
-        binary = shutil.which(self._openclaw_bin)
-        if binary is None:
-            raise RuntimeError(
-                "OpenClaw CLI was not found. Install/configure OpenClaw or use --executor local."
-            )
-
-        message = (
-            "Run MTBUDDY workspace task using the configured MTClaw Function Router tools. "
-            f"Workspace: {resolved_workspace}. Request: {request}"
-        )
-        completed = subprocess.run(
-            [
-                binary,
-                "agent",
-                "--agent",
-                "mtbuddy",
-                "--message",
-                message,
-                "--local",
-                "--json",
-            ],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        if completed.returncode != 0:
-            raise RuntimeError(completed.stderr.strip() or "OpenClaw agent run failed.")
-
-        output_path = resolved_workspace / "artifacts" / "openclaw-response.json"
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            parsed = json.loads(completed.stdout)
-            output_path.write_text(json.dumps(parsed, indent=2, sort_keys=True), encoding="utf-8")
-        except json.JSONDecodeError:
-            output_path.write_text(completed.stdout, encoding="utf-8")
-
-        return RunResult(
-            workspace=resolved_workspace,
-            request=request,
-            artifacts={
-                "openclaw_response": output_path,
-            },
-        )
+        return self._executor.run(workspace, request)

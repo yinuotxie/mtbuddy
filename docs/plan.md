@@ -25,7 +25,7 @@ AIBOOK hardware:
 
 - We do not have physical MTT AIBOOK hardware yet.
 - MTClaw is a competition requirement, so the product must expose a real
-  OpenClaw/MTClaw path early.
+  OpenAI-compatible agent path through MTClaw early.
 - The first implementation still keeps `LocalExecutor` for deterministic tests
   and offline development.
 - AIBOOK's local LLM surface appears OpenAI-compatible, so model access should
@@ -39,12 +39,15 @@ AIBOOK hardware:
 User request
   -> Workstation UI
   -> MTBUDDY core
-  -> OpenClaw agent runtime
+  -> OpenAI-compatible agent client
+       -> OpenClawAgentClient
+       -> FunctionRouterAgentClient
+       -> Hermes / OpenCode / Codex-like clients through MTClaw
   -> MTClaw Function Router provider
   -> Planner / Skill router
   -> Executor
        -> LocalExecutor
-       -> OpenClawExecutor
+       -> AgentExecutor
   -> Artifact store
   -> Audit log
   -> Evaluation report
@@ -162,9 +165,10 @@ Build skills as boring, testable units.
    - Capture sources.
    - Produce traceable notes.
 
-7. `openclaw_mtclaw_adapter`
+7. `openai_agent_mtclaw_adapter`
    - Register MTBUDDY tools with MTClaw Function Router.
    - Run the competition agent path through OpenClaw.
+   - Support direct Function Router calls for any OpenAI-compatible client.
    - Maintain deterministic local tests through the `Executor` interface.
 
 ## Evaluation Plan
@@ -223,9 +227,10 @@ packages/
 ```
 
 Do not create all folders immediately unless they are used by the first slice.
-The first implementation wave should introduce only the CLI core, OpenClaw /
-MTClaw integration assets, file skill, document skill, sheet skill, and eval
-fixtures required for the proof workflow.
+The first implementation wave should introduce only the CLI core,
+OpenAI-compatible agent client abstraction, OpenClaw / MTClaw integration
+assets, file skill, document skill, sheet skill, and eval fixtures required for
+the proof workflow.
 
 ## First Implementation Slice
 
@@ -236,17 +241,18 @@ fixtures required for the proof workflow.
 5. Implement `doc_skill` Markdown output.
 6. Implement `sheet_skill` action-item CSV output.
 7. Add audit logging for every operation.
-8. Add MTClaw Function Router tool definitions and wrappers.
-9. Add one end-to-end eval fixture.
-10. Run the eval from CLI.
-11. Add UI only after CLI workflow passes.
-12. Package only after the workflow is stable.
+8. Add the OpenAI-compatible agent client abstraction.
+9. Add MTClaw Function Router tool definitions and wrappers.
+10. Add one end-to-end eval fixture.
+11. Run the eval from CLI.
+12. Add UI only after CLI workflow passes.
+13. Package only after the workflow is stable.
 
 ## Risks And Mitigations
 
-- Risk: OpenClaw or MTClaw is not installed in CI.
+- Risk: OpenAI-compatible agent runtimes or MTClaw are not installed in CI.
   - Mitigation: keep `LocalExecutor` as the deterministic test path and make
-    OpenClaw fail fast with setup instructions.
+    agent clients fail fast with setup instructions.
 
 - Risk: app looks like a generic assistant.
   - Mitigation: emphasize execution timeline, local artifacts, eval metrics, and

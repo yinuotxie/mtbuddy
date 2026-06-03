@@ -2,7 +2,7 @@
 
 Date: 2026-06-03
 
-- Decision: Use OpenClaw as the agent runtime and MTClaw Function Router as the required tool-routing layer.
+- Decision: Expose MTBUDDY tools through MTClaw Function Router so OpenClaw, Hermes, OpenCode, and Codex-like OpenAI-compatible agents can call them.
 - Decision: Keep MTBUDDY artifacts local to each workspace for judge inspection.
 - Action: Travis - confirm competition demo narrative due 2026-06-05
 - Action: Product - prepare the first Tauri workstation mock after the CLI slice passes due 2026-06-07

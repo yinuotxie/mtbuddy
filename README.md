@@ -9,7 +9,9 @@ For the competition track, MTBUDDY is built around this runtime story:
 ```text
 MTBUDDY workstation UI or CLI
   -> MTBUDDY core: workspace, artifacts, audit log
-  -> OpenClaw agent runtime
+  -> OpenAI-compatible agent client
+       -> OpenClaw as the flagship demo client
+       -> Hermes / OpenCode / Codex-like direct clients through MTClaw
   -> MTClaw Function Router provider
   -> DeepSeek API now
   -> AIBOOK local model endpoint later
@@ -28,7 +30,9 @@ the Tauri desktop UI is built.
 - Deterministic `file_skill`, `doc_skill`, and `sheet_skill`.
 - Local artifact output under `<workspace>/artifacts/`.
 - Append-only JSONL audit log for every operation.
-- OpenClaw executor seam.
+- OpenAI-compatible agent client abstraction.
+- OpenClaw agent client.
+- Direct MTClaw Function Router client.
 - MTClaw Function Router tool definitions and wrapper scripts.
 - End-to-end pytest coverage for the CLI and MTClaw tool entrypoint.
 
@@ -71,10 +75,12 @@ python -m pytest
 The test suite copies the demo workspace to a temp directory, runs the real CLI,
 and verifies the report sections, action CSV, and audit operations.
 
-## OpenClaw And MTClaw
+## OpenAI-Compatible Agents And MTClaw
 
 Automated tests use `--executor local` so they do not require OpenClaw, MTClaw,
-DeepSeek, or AIBOOK hardware. The competition path uses OpenClaw and MTClaw:
+DeepSeek, or AIBOOK hardware.
+
+OpenClaw is the flagship competition path:
 
 ```bash
 mtbuddy run --executor openclaw --workspace ./workspaces/demo \
@@ -84,6 +90,18 @@ mtbuddy run --executor openclaw --workspace ./workspaces/demo \
 That command expects the `openclaw` CLI to be installed and configured with a
 `mtbuddy` agent whose model provider points at MTClaw Function Router.
 
+MTBUDDY can also call MTClaw directly through its OpenAI-compatible API:
+
+```bash
+export MTBUDDY_FUNCTION_ROUTER_BASE_URL=http://127.0.0.1:18790/v1
+export MTBUDDY_FUNCTION_ROUTER_MODEL=function_router/function-router
+mtbuddy run --executor function-router --workspace ./workspaces/demo \
+  "Summarize these files and create an action list"
+```
+
+That same MTClaw provider surface can be used by Hermes, OpenCode, Codex-like
+clients, or any agent/client that supports an OpenAI-compatible `base_url`.
+
 MTClaw integration assets live in:
 
 ```text
@@ -91,10 +109,10 @@ integrations/mtclaw/functions.jsonl
 integrations/mtclaw/scripts/
 ```
 
-See [OpenClaw And MTClaw Integration](docs/openclaw-mtclaw.md) for the manual
-DeepSeek/Function Router setup path.
+See [OpenAI-Compatible Agents And MTClaw Integration](docs/openclaw-mtclaw.md)
+for the manual DeepSeek/Function Router setup path.
 
 ## Project Plan
 
 - [Project plan](docs/plan.md)
-- [OpenClaw and MTClaw integration](docs/openclaw-mtclaw.md)
+- [OpenAI-compatible agents and MTClaw integration](docs/openclaw-mtclaw.md)
