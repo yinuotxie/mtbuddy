@@ -1,15 +1,15 @@
-# MTBudy Project Plan
+# MTBUDDY Project Plan
 
 Last updated: 2026-06-03
 
 ## Product Thesis
 
-MTBuddy is not another chat UI. It is a personal AI workstation that accepts a
+MTBUDDY is not another chat UI. It is a personal AI workstation that accepts a
 work request, routes it to skills, executes local tools, and returns verifiable
 outputs. The competition angle is:
 
 > A local-first "fast, accurate, decisive" personal AI workstation inspired by
-> MTClaw, built for eventual deployment on MTT AIBOOK and MTT AIOS.
+> MTClaw, built for MTT AIBOOK and MTT AIOS.
 
 The first build should prove the core workflow without requiring real MTT
 AIBOOK hardware:
@@ -24,24 +24,27 @@ AIBOOK hardware:
 ## Current Constraints
 
 - We do not have physical MTT AIBOOK hardware yet.
-- MTClaw public information is currently product/news oriented; stable SDK
-  details may change.
-- We can still build a credible app by isolating the execution backend:
-  `LocalExecutor` first, `MTClawExecutor` later.
+- MTClaw is a competition requirement, so the product must expose a real
+  OpenClaw/MTClaw path early.
+- The first implementation still keeps `LocalExecutor` for deterministic tests
+  and offline development.
 - AIBOOK's local LLM surface appears OpenAI-compatible, so model access should
   be abstracted behind a provider interface.
+- DeepSeek is the near-term cloud model provider while AIBOOK hardware is not
+  available.
 
 ## Architecture Direction
 
 ```text
 User request
   -> Workstation UI
-  -> Agent core
-  -> Planner
-  -> Skill router
+  -> MTBUDDY core
+  -> OpenClaw agent runtime
+  -> MTClaw Function Router provider
+  -> Planner / Skill router
   -> Executor
        -> LocalExecutor
-       -> MTClawExecutor
+       -> OpenClawExecutor
   -> Artifact store
   -> Audit log
   -> Evaluation report
@@ -49,8 +52,8 @@ User request
 
 Core interfaces:
 
-- `LLMProvider`: OpenAI-compatible API, Ollama, vLLM, future AIBOOK
-  `musachat_local`.
+- `LLMProvider`: DeepSeek now, OpenAI-compatible API, Ollama, vLLM, future
+  AIBOOK `musachat_local`.
 - `Skill`: typed input, typed output, declared permissions, artifact contract.
 - `Executor`: runs shell/browser/file/document actions with logs.
 - `ArtifactStore`: stores generated documents, sheets, slides, reports, and
@@ -76,7 +79,7 @@ Why this first:
 
 Definition of done:
 
-- User can submit the task from the app.
+- User can submit the task from the CLI first, then the workstation UI.
 - Agent creates a structured plan before execution.
 - User sees requested permissions before filesystem changes.
 - System reads local files from an allowed workspace.
@@ -89,7 +92,7 @@ Definition of done:
 
 ### Include
 
-- Desktop/web workstation UI.
+- CLI-first core, then Tauri workstation UI.
 - Chat/task panel with live execution timeline.
 - Local file workspace picker.
 - Basic planner and skill router.
@@ -106,14 +109,13 @@ Definition of done:
 - Voice wake word.
 - Digital human avatar.
 - Complex browser automation.
-- Native MTClaw integration until API details are confirmed.
 - Heavy local model hosting inside the app.
 
 ## Technology Recommendation
 
 Use a pragmatic stack that can ship quickly and package cleanly:
 
-- App shell: Tauri or Electron.
+- App shell: Tauri.
 - Frontend: React + TypeScript.
 - Backend: Python FastAPI or Node/TypeScript service.
 - Skills: Python where document/data libraries are strongest.
@@ -160,9 +162,10 @@ Build skills as boring, testable units.
    - Capture sources.
    - Produce traceable notes.
 
-7. `mtclaw_adapter`
-   - Implement only after public SDK/API is available or AIBOOK access exists.
-   - Maintain compatibility through the `Executor` interface.
+7. `openclaw_mtclaw_adapter`
+   - Register MTBUDDY tools with MTClaw Function Router.
+   - Run the competition agent path through OpenClaw.
+   - Maintain deterministic local tests through the `Executor` interface.
 
 ## Evaluation Plan
 
@@ -220,8 +223,9 @@ packages/
 ```
 
 Do not create all folders immediately unless they are used by the first slice.
-The first implementation wave should introduce only the UI, agent core, file
-skill, document skill, and eval fixtures required for the proof workflow.
+The first implementation wave should introduce only the CLI core, OpenClaw /
+MTClaw integration assets, file skill, document skill, sheet skill, and eval
+fixtures required for the proof workflow.
 
 ## First Implementation Slice
 
@@ -230,16 +234,19 @@ skill, document skill, and eval fixtures required for the proof workflow.
 3. Implement `Skill` and `Executor` interfaces.
 4. Implement `file_skill` read/list/write operations.
 5. Implement `doc_skill` Markdown output.
-6. Add audit logging for every operation.
-7. Add one end-to-end eval fixture.
-8. Run the eval from CLI.
-9. Add UI only after CLI workflow passes.
-10. Package only after the workflow is stable.
+6. Implement `sheet_skill` action-item CSV output.
+7. Add audit logging for every operation.
+8. Add MTClaw Function Router tool definitions and wrappers.
+9. Add one end-to-end eval fixture.
+10. Run the eval from CLI.
+11. Add UI only after CLI workflow passes.
+12. Package only after the workflow is stable.
 
 ## Risks And Mitigations
 
-- Risk: MTClaw APIs change or are not public enough.
-  - Mitigation: keep `MTClawExecutor` behind an interface.
+- Risk: OpenClaw or MTClaw is not installed in CI.
+  - Mitigation: keep `LocalExecutor` as the deterministic test path and make
+    OpenClaw fail fast with setup instructions.
 
 - Risk: app looks like a generic assistant.
   - Mitigation: emphasize execution timeline, local artifacts, eval metrics, and
@@ -257,7 +264,7 @@ skill, document skill, and eval fixtures required for the proof workflow.
 Start with a CLI-first vertical slice:
 
 ```text
-mtbuddy run --workspace ./workspaces/demo \
+mtbuddy run --executor local --workspace ./workspaces/demo \
   "Summarize these files and create an action list"
 ```
 

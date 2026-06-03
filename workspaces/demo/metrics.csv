@@ -1,0 +1,4 @@
+team,metric,status,action_owner,follow_up,due_date,priority
+Core,allowed files,green,Engineering,Add permission summary to the next UI slice,2026-06-09,medium
+Docs,competition story,yellow,Travis,Update README with OpenClaw and MTClaw positioning,2026-06-05,high
+Demo,audit trail,green,QA,Verify audit log contains every operation,2026-06-06,high

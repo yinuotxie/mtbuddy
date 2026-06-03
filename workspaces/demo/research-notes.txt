@@ -1,0 +1,5 @@
+MTBUDDY should feel like a work buddy rather than a generic chat window.
+
+Decision: The first milestone remains CLI-first so the engine is verified before the desktop UI.
+Action: Engineering - wire DeepSeek through MTClaw provider config after local evals pass by 2026-06-06
+Action: Design - draft the workstation task timeline and artifact drawer due 2026-06-08
