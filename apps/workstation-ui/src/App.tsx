@@ -1,466 +1,232 @@
-import { useMemo, useState } from "react";
 import {
-  Activity,
-  ArrowRight,
+  BarChart3,
+  BookOpen,
   Bot,
-  CheckCircle2,
+  BriefcaseBusiness,
+  ChevronDown,
+  ChevronRight,
+  CircleEllipsis,
+  Code2,
   Cpu,
-  Database,
-  Download,
-  Eye,
-  FileText,
-  FolderOpen,
-  Gauge,
-  HardDrive,
-  History,
-  Laptop,
-  Layers3,
-  ListChecks,
-  LockKeyhole,
-  Network,
-  Play,
-  RefreshCcw,
+  Folder,
+  Filter,
+  GraduationCap,
+  Grid2X2,
+  LayoutPanelLeft,
+  Link2,
+  Mail,
+  Mic,
+  MoreHorizontal,
+  Palette,
+  PanelLeft,
+  Plus,
+  Rocket,
+  Search,
+  Send,
   ShieldCheck,
-  SlidersHorizontal,
-  SquareTerminal,
-  Table2,
-  Workflow,
-  Wrench
+  Sparkles,
+  TimerReset
 } from "lucide-react";
 import {
-  actionRows,
-  artifactIcons,
-  artifacts,
-  auditRows,
-  metricCards,
-  reportSections,
-  runModes,
-  skillPacks,
-  statusIcon,
-  timelineItems,
-  workspace
+  categoryChips,
+  composerTools,
+  leftNavItems,
+  workspaceOptions
 } from "./mockData";
-import type { Artifact, SkillPack, TimelineItem } from "./mockData";
 
-const statusLabel = {
-  active: "active",
-  mock: "mock",
-  planned: "planned"
+const iconMap = {
+  assistant: Bot,
+  expert: GraduationCap,
+  skills: BookOpen,
+  connectors: Link2,
+  automation: TimerReset,
+  more: CircleEllipsis,
+  docs: BookOpen,
+  finance: BarChart3,
+  data: Grid2X2,
+  research: Search,
+  product: Folder,
+  slides: BriefcaseBusiness,
+  design: Palette,
+  email: Mail,
+  craft: Sparkles,
+  auto: Grid2X2,
+  permission: ShieldCheck
 };
 
 function App() {
-  const [mode, setMode] = useState(runModes[0].id);
-  const [selectedArtifactId, setSelectedArtifactId] = useState(artifacts[0].id);
-
-  const selectedArtifact = useMemo(
-    () => artifacts.find((artifact) => artifact.id === selectedArtifactId) ?? artifacts[0],
-    [selectedArtifactId]
-  );
-
   return (
     <div className="app-shell">
-      <aside className="sidebar" aria-label="Workspace">
-        <Brand />
-        <WorkspaceCard />
-        <SkillRegistry />
-        <BridgePanel mode={mode} />
-      </aside>
-
-      <main className="workbench">
-        <header className="topbar">
-          <div className="run-state">
-            <span className="state-dot" />
-            <span>Local-first mock</span>
-          </div>
-          <div className="topbar-actions" aria-label="Run controls">
-            <button className="icon-button ghost" type="button" aria-label="Refresh mock data">
-              <RefreshCcw size={17} />
-            </button>
-            <button className="icon-button ghost" type="button" aria-label="Tune execution settings">
-              <SlidersHorizontal size={17} />
-            </button>
-            <button className="primary-action" type="button">
-              <Play size={17} />
-              Run
-            </button>
-          </div>
+      <Sidebar />
+      <main className="home-screen">
+        <header className="floating-header">
+          <button className="plain-icon" type="button" aria-label="Toggle sidebar">
+            <PanelLeft size={20} />
+          </button>
+          <button className="demo-pill" type="button">
+            <Rocket size={18} />
+            来完成比赛演示
+            <ChevronRight size={18} />
+          </button>
         </header>
 
-        <section className="command-panel" aria-labelledby="request-label">
-          <div className="command-copy">
-            <span className="eyebrow" id="request-label">
-              Task request
-            </span>
-            <h1>{workspace.request}</h1>
-          </div>
-          <div className="mode-switch" role="tablist" aria-label="Executor mode">
-            {runModes.map((runMode) => (
-              <button
-                className={runMode.id === mode ? "mode-pill active" : "mode-pill"}
-                key={runMode.id}
-                type="button"
-                role="tab"
-                aria-selected={runMode.id === mode}
-                onClick={() => setMode(runMode.id)}
-              >
-                <span>{runMode.label}</span>
-                <small>{runMode.status}</small>
-              </button>
-            ))}
+        <section className="hero" aria-labelledby="hero-title">
+          <AssistantGlyph />
+          <h1 id="hero-title">MTBUDDY，我帮你</h1>
+          <div className="work-mode" role="tablist" aria-label="工作模式">
+            <button type="button" role="tab" aria-selected="false">
+              <Code2 size={18} />
+              代码开发
+            </button>
+            <button className="active" type="button" role="tab" aria-selected="true">
+              <BriefcaseBusiness size={18} />
+              日常办公
+            </button>
           </div>
         </section>
 
-        <section className="metrics-grid" aria-label="Run metrics">
-          {metricCards.map(({ label, value, caption, Icon }) => (
-            <article className="metric-card" key={label}>
-              <Icon size={18} />
-              <div>
-                <strong>{value}</strong>
-                <span>{label}</span>
+        <section className="composer-zone" aria-label="任务输入">
+          <div className="quick-chips" aria-label="常用任务">
+            {categoryChips.map((chip) => {
+              const Icon = iconMap[chip.icon];
+              return (
+                <button key={chip.label} className="quick-chip" type="button">
+                  <Icon size={18} />
+                  {chip.label}
+                </button>
+              );
+            })}
+            <button className="quick-chip icon-only" type="button" aria-label="更多任务类型">
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          <div className="composer-card">
+            <textarea placeholder="今天帮你做些什么？" aria-label="任务内容" />
+            <div className="composer-footer">
+              <div className="tool-row" aria-label="任务选项">
+                {composerTools.map((tool) => {
+                  const Icon = iconMap[tool.icon];
+                  return (
+                    <button key={tool.label} type="button">
+                      <Icon size={18} />
+                      {tool.label}
+                      <ChevronDown size={16} />
+                    </button>
+                  );
+                })}
               </div>
-              <small>{caption}</small>
-            </article>
-          ))}
-        </section>
+              <div className="send-row">
+                <button className="round-button" type="button" aria-label="添加附件">
+                  <Plus size={22} />
+                </button>
+                <button className="round-button" type="button" aria-label="语音输入">
+                  <Mic size={21} />
+                </button>
+                <button className="send-button" type="button" aria-label="发送任务">
+                  <Send size={22} />
+                </button>
+              </div>
+            </div>
+          </div>
 
-        <section className="run-grid">
-          <TimelinePanel />
-          <ArtifactPreview artifact={selectedArtifact} />
+          <button className="workspace-picker" type="button">
+            <Folder size={20} />
+            {workspaceOptions[0]}
+            <ChevronDown size={17} />
+          </button>
         </section>
       </main>
-
-      <aside className="artifact-rail" aria-label="Artifacts">
-        <ArtifactList selectedArtifactId={selectedArtifactId} onSelect={setSelectedArtifactId} />
-        <AuditPanel />
-      </aside>
     </div>
   );
 }
 
-function Brand() {
+function Sidebar() {
   return (
-    <div className="brand-block">
-      <div className="brand-mark" aria-hidden="true">
-        <Laptop size={22} />
+    <aside className="sidebar" aria-label="MTBUDDY navigation">
+      <div className="sidebar-topbar">
+        <button className="sidebar-icon" type="button" aria-label="Collapse">
+          <LayoutPanelLeft size={20} />
+        </button>
+        <button className="sidebar-icon" type="button" aria-label="Search">
+          <Search size={21} />
+        </button>
+        <button className="sidebar-icon" type="button" aria-label="Filter">
+          <Filter size={20} />
+        </button>
       </div>
-      <div>
-        <p>MTBUDDY</p>
-        <span>AIBOOK workstation</span>
-      </div>
-    </div>
-  );
-}
 
-function WorkspaceCard() {
-  return (
-    <section className="panel workspace-card" aria-labelledby="workspace-title">
-      <div className="panel-heading">
-        <div>
-          <span className="eyebrow">Workspace</span>
-          <h2 id="workspace-title">{workspace.name}</h2>
-        </div>
-        <FolderOpen size={18} />
+      <div className="brand-line">
+        <strong>MTBUDDY</strong>
+        <span>v0.1.0</span>
       </div>
-      <code>{workspace.path}</code>
-      <div className="file-stack">
-        {workspace.files.map((file) => (
-          <div className="file-row" key={file}>
-            <FileText size={15} />
-            <span>{file}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
-function SkillRegistry() {
-  return (
-    <section className="panel skill-panel" aria-labelledby="skill-title">
-      <div className="panel-heading">
-        <div>
-          <span className="eyebrow">Skill registry</span>
-          <h2 id="skill-title">Local tools</h2>
-        </div>
-        <Wrench size={18} />
-      </div>
-      <div className="skill-list">
-        {skillPacks.map((skill) => (
-          <SkillRow key={skill.id} skill={skill} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function SkillRow({ skill }: { skill: SkillPack }) {
-  return (
-    <div className="skill-row">
-      <div className={`skill-status ${skill.status}`} />
-      <div>
-        <strong>{skill.label}</strong>
-        <span>{skill.description}</span>
-      </div>
-      <small>{statusLabel[skill.status]}</small>
-    </div>
-  );
-}
-
-function BridgePanel({ mode }: { mode: string }) {
-  const activeMode = runModes.find((runMode) => runMode.id === mode) ?? runModes[0];
-
-  return (
-    <section className="panel bridge-panel" aria-labelledby="bridge-title">
-      <div className="panel-heading">
-        <div>
-          <span className="eyebrow">Agent bridge</span>
-          <h2 id="bridge-title">{activeMode.label}</h2>
-        </div>
-        <Network size={18} />
-      </div>
-      <div className="bridge-route">
-        <span>MTBUDDY Core</span>
-        <ArrowRight size={15} />
-        <span>{mode === "local" ? "LocalExecutor" : "MTClaw"}</span>
-        <ArrowRight size={15} />
-        <span>{mode === "openclaw" ? "OpenClaw" : "OpenAI API"}</span>
-      </div>
-      <div className="trust-strip">
-        <span>
-          <LockKeyhole size={14} />
-          local-first
-        </span>
-        <span>
-          <ShieldCheck size={14} />
-          audited
-        </span>
-      </div>
-    </section>
-  );
-}
-
-function TimelinePanel() {
-  return (
-    <section className="panel timeline-panel" aria-labelledby="timeline-title">
-      <div className="panel-heading">
-        <div>
-          <span className="eyebrow">Execution</span>
-          <h2 id="timeline-title">Run timeline</h2>
-        </div>
-        <Activity size={18} />
-      </div>
-      <div className="timeline-list">
-        {timelineItems.map((item) => (
-          <TimelineRow key={item.id} item={item} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function TimelineRow({ item }: { item: TimelineItem }) {
-  const Icon = statusIcon[item.status];
-
-  return (
-    <div className={`timeline-row ${item.status}`}>
-      <div className="timeline-icon">
-        <Icon size={16} />
-      </div>
-      <div className="timeline-main">
-        <strong>{item.label}</strong>
-        <span>{item.skill}</span>
-      </div>
-      <code>{item.evidence}</code>
-      <small>{item.duration}</small>
-    </div>
-  );
-}
-
-function ArtifactList({
-  selectedArtifactId,
-  onSelect
-}: {
-  selectedArtifactId: string;
-  onSelect: (artifactId: string) => void;
-}) {
-  return (
-    <section className="panel artifact-list-panel" aria-labelledby="artifact-list-title">
-      <div className="panel-heading">
-        <div>
-          <span className="eyebrow">Artifacts</span>
-          <h2 id="artifact-list-title">Workspace output</h2>
-        </div>
-        <Database size={18} />
-      </div>
-      <div className="artifact-list">
-        {artifacts.map((artifact) => {
-          const Icon = artifactIcons[artifact.kind];
-          const isSelected = artifact.id === selectedArtifactId;
-
+      <nav className="nav-list" aria-label="Primary">
+        <button className="new-task" type="button">
+          <Plus size={18} />
+          新建任务
+        </button>
+        {leftNavItems.map((item) => {
+          const Icon = iconMap[item.icon];
           return (
-            <button
-              className={isSelected ? "artifact-item selected" : "artifact-item"}
-              key={artifact.id}
-              type="button"
-              onClick={() => onSelect(artifact.id)}
-            >
-              <Icon size={18} />
+            <button className="nav-item" key={item.label} type="button">
               <span>
-                <strong>{artifact.name}</strong>
-                <small>{artifact.path}</small>
+                <Icon size={21} />
+                {item.label}
               </span>
-              <CheckCircle2 size={16} />
+              <small>{item.meta}</small>
             </button>
           );
         })}
+      </nav>
+
+      <div className="empty-tasks">
+        <strong>暂无任务</strong>
       </div>
-    </section>
+
+      <div className="account-row">
+        <div className="avatar" aria-hidden="true">
+          <Cpu size={22} />
+        </div>
+        <strong>Aetronus</strong>
+        <button className="sidebar-icon" type="button" aria-label="Account options">
+          <MoreHorizontal size={19} />
+        </button>
+      </div>
+    </aside>
   );
 }
 
-function ArtifactPreview({ artifact }: { artifact: Artifact }) {
-  const Icon = artifactIcons[artifact.kind];
-
+function AssistantGlyph() {
   return (
-    <section className="panel preview-panel" aria-labelledby="preview-title">
-      <div className="panel-heading">
-        <div>
-          <span className="eyebrow">Preview</span>
-          <h2 id="preview-title">{artifact.name}</h2>
-        </div>
-        <div className="preview-actions">
-          <button className="icon-button ghost" type="button" aria-label="View artifact">
-            <Eye size={16} />
-          </button>
-          <button className="icon-button ghost" type="button" aria-label="Download artifact">
-            <Download size={16} />
-          </button>
-        </div>
-      </div>
-      <div className={`artifact-preview ${artifact.kind}`}>
-        <div className="preview-title">
-          <Icon size={23} />
-          <div>
-            <strong>{artifact.detail}</strong>
-            <span>{artifact.path}</span>
-          </div>
-        </div>
-        {artifact.kind === "markdown" && <ReportPreview />}
-        {artifact.kind === "csv" && <CsvPreview />}
-        {artifact.kind === "pptx" && <DeckPreview />}
-        {artifact.kind === "jsonl" && <JsonlPreview />}
-      </div>
-    </section>
-  );
-}
-
-function ReportPreview() {
-  return (
-    <div className="report-preview">
-      {reportSections.map((section, index) => (
-        <div className="section-line" key={section}>
-          <span>{String(index + 1).padStart(2, "0")}</span>
-          <strong>{section}</strong>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function CsvPreview() {
-  return (
-    <div className="csv-preview">
-      <div className="csv-header">
-        <span>Owner</span>
-        <span>Action</span>
-        <span>Status</span>
-      </div>
-      {actionRows.map((row) => (
-        <div className="csv-row" key={`${row.owner}-${row.task}`}>
-          <span>{row.owner}</span>
-          <span>{row.task}</span>
-          <strong>{row.state}</strong>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function DeckPreview() {
-  return (
-    <div className="deck-preview">
-      <div className="slide-card title-slide">
-        <span>01</span>
-        <strong>MTBUDDY</strong>
-        <small>Local-first personal AI workstation</small>
-      </div>
-      <div className="slide-grid">
-        <div className="slide-card">
-          <Layers3 size={17} />
-          <strong>Skills</strong>
-        </div>
-        <div className="slide-card">
-          <Workflow size={17} />
-          <strong>MTClaw</strong>
-        </div>
-        <div className="slide-card">
-          <Gauge size={17} />
-          <strong>Evals</strong>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function JsonlPreview() {
-  return (
-    <div className="jsonl-preview">
-      {auditRows.map((row, index) => (
-        <code key={row}>
-          {`{"seq":${index + 1},"operation":"${row}","status":"ok"}`}
-        </code>
-      ))}
-    </div>
-  );
-}
-
-function AuditPanel() {
-  return (
-    <section className="panel audit-panel" aria-labelledby="audit-title">
-      <div className="panel-heading">
-        <div>
-          <span className="eyebrow">Evidence</span>
-          <h2 id="audit-title">Run ledger</h2>
-        </div>
-        <History size={18} />
-      </div>
-      <div className="ledger-grid">
-        <div>
-          <SquareTerminal size={17} />
-          <span>CLI</span>
-          <strong>pytest pass</strong>
-        </div>
-        <div>
-          <Bot size={17} />
-          <span>Agent</span>
-          <strong>OpenAI-compatible</strong>
-        </div>
-        <div>
-          <Cpu size={17} />
-          <span>AIBOOK</span>
-          <strong>adapter ready</strong>
-        </div>
-        <div>
-          <HardDrive size={17} />
-          <span>Storage</span>
-          <strong>workspace local</strong>
-        </div>
-      </div>
-      <div className="audit-command">
-        <ListChecks size={16} />
-        <code>mtbuddy run --workspace ./workspaces/demo</code>
-      </div>
-    </section>
+    <svg
+      className="assistant-glyph"
+      viewBox="0 0 210 176"
+      role="img"
+      aria-label="MTBUDDY assistant"
+    >
+      <defs>
+        <pattern id="mesh" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.6" />
+        </pattern>
+      </defs>
+      <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M63 42c3-19 14-31 29-34 3 17 1 31-6 42" />
+        <path d="M147 42c-3-19-14-31-29-34-3 17-1 31 6 42" />
+        <rect x="48" y="35" width="114" height="84" rx="42" fill="url(#mesh)" strokeWidth="2" />
+        <rect x="35" y="55" width="26" height="48" rx="13" fill="url(#mesh)" strokeWidth="2" />
+        <rect x="149" y="55" width="26" height="48" rx="13" fill="url(#mesh)" strokeWidth="2" />
+        <path d="M86 68v26" strokeWidth="4" />
+        <path d="M124 68v26" strokeWidth="4" />
+        <path d="M76 119c-10 8-18 18-22 32" />
+        <path d="M134 119c10 8 18 18 22 32" />
+        <circle cx="72" cy="150" r="22" fill="url(#mesh)" strokeWidth="2" />
+        <circle cx="138" cy="150" r="22" fill="url(#mesh)" strokeWidth="2" />
+        <path d="M94 127h22" />
+        <path d="M176 119c12 4 19 12 22 25" />
+        <path d="M187 149l15 12" />
+      </g>
+    </svg>
   );
 }
 

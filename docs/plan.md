@@ -256,23 +256,25 @@ the proof workflow.
   - Mitigation: keep `LocalExecutor` as the deterministic test path and make
     agent clients fail fast with setup instructions.
 
-- Risk: app looks like a generic assistant.
-  - Mitigation: emphasize execution timeline, local artifacts, eval metrics, and
-    AIBOOK/AIOS compatibility in docs and demo.
+- Risk: app looks too complex for normal users.
+  - Mitigation: keep the first screen as a simple task composer, then reveal
+    timeline, artifacts, audit, MTClaw, and runtime details only after a task
+    starts or the user opens details.
 
 ## Workstation UI Slice
 
 The first UI slice lives in `apps/workstation-ui` and is intentionally a mock:
-it shows the product shape without requiring Tauri runtime wiring yet.
+it shows the product shape without requiring Tauri runtime wiring yet. The
+default surface should be closer to WorkBuddy than an operator cockpit.
 
 It should make these ideas obvious in the first viewport:
 
-- MTBUDDY is a workstation around local workspaces, not a generic chat app.
-- `LocalExecutor` remains the deterministic/offline path.
-- MTClaw is the OpenAI-compatible function-router bridge.
-- OpenClaw is the flagship competition agent path, while other compatible
-  agents can use the same provider surface.
-- Artifacts and audit logs are first-class outputs.
+- MTBUDDY starts from a single user task, not a dashboard.
+- Users can choose common work categories like documents, data, slides, design,
+  research, and email.
+- Skills, connectors, permissions, and workspace selection are available as
+  compact controls.
+- Advanced execution details stay out of the way until needed.
 
 The next UI implementation wave should connect this shell to a local backend
 process that invokes the existing Python core, streams timeline events, and

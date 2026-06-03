@@ -4,27 +4,32 @@ Last updated: 2026-06-03
 
 ## Purpose
 
-The workstation UI should make MTBUDDY feel like an inspectable local workbench:
-the user points it at a workspace, submits a task, watches skills execute, and
-opens generated artifacts with an audit trail beside them.
+The workstation UI should feel like a simple daily work buddy first, and an
+inspectable agent workstation second. The default screen should not expose
+execution internals, audit panels, or artifact grids until the user starts a
+task or opens details.
 
-The first mock is Tauri-ready but browser-verified. That keeps us moving without
-requiring real MTT AIBOOK hardware, MTClaw installation, or a local Rust/Tauri
-toolchain in this worktree.
+The current mock is Tauri-ready but browser-verified. That keeps us moving
+without requiring real MTT AIBOOK hardware, MTClaw installation, or a local
+Rust/Tauri toolchain in this worktree.
 
 ## Product Shape
 
-The mock uses three persistent work areas:
+The first screen follows a WorkBuddy-style layout:
 
-- Left rail: current workspace, allowed source files, registered skills, and
-  the selected agent bridge.
-- Center workbench: task request, executor switch, run metrics, and execution
-  timeline.
-- Right rail: artifact list, artifact preview, and run ledger.
+- Left sidebar: new task, assistant, experts, skills, connectors, automation,
+  and more.
+- Center welcome: MTBUDDY greeting plus a simple work-mode switch.
+- Bottom composer: category chips, prompt box, tool chips, send controls, and
+  workspace picker.
 
-This structure is deliberate. Judges should see the local files, the skill
-routing, the generated files, and the audit evidence without digging through a
-chat transcript.
+Advanced MTBUDDY concepts still matter, but they belong behind task details:
+
+- Skills should appear as composer chips and a sidebar destination.
+- Connectors should appear as an option, not a first-screen architecture panel.
+- Permissions should stay visible as a compact control.
+- MTClaw/OpenClaw/runtime details should be shown only in setup or run details.
+- Artifacts and audit logs should appear after a task produces outputs.
 
 ## Runtime Direction
 
@@ -40,7 +45,7 @@ Tauri window
   -> workspace artifacts and audit log
 ```
 
-The executor switch in the UI maps to the existing CLI direction:
+The simple home screen does not remove the existing engine direction:
 
 - `LocalExecutor`: deterministic offline mode for tests and demos.
 - `MTClaw`: direct Function Router provider path.
@@ -63,7 +68,7 @@ npm run test:smoke
 ```
 
 The smoke test launches the mock locally, renders desktop and mobile viewports
-with Playwright, checks for the expected artifact panels, and rejects horizontal
+with Playwright, checks the simple home-screen elements, and rejects horizontal
 overflow.
 
 ## Desktop Shell

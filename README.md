@@ -88,9 +88,11 @@ and verifies the report sections, action CSV, and audit operations.
 
 ## Workstation UI Mock
 
-The first desktop UI pass is a Tauri-ready React mock. It runs in the browser
-today and keeps the Tauri wrapper scaffold in place for Linux packaging once
-Rust/Cargo and the Tauri system prerequisites are installed.
+The desktop UI pass is a Tauri-ready React mock with a simple WorkBuddy-style
+home screen: sidebar, centered welcome, category chips, prompt composer, and
+workspace picker. It runs in the browser today and keeps the Tauri wrapper
+scaffold in place for Linux packaging once Rust/Cargo and the Tauri system
+prerequisites are installed.
 
 ```bash
 cd apps/workstation-ui

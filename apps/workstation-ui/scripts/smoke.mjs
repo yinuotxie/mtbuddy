@@ -8,7 +8,7 @@ import { chromium } from "playwright";
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const port = process.env.MTBUDDY_UI_SMOKE_PORT ?? "5174";
 const url = `http://127.0.0.1:${port}/`;
-const expectedTitle = "Summarize these files and create an action list";
+const expectedTitle = "MTBUDDY，我帮你";
 const serverLogs = [];
 
 const server = spawn(
@@ -52,18 +52,18 @@ async function inspectViewport(browser, target) {
   await page.screenshot({ path: target.path, fullPage: true });
 
   const metrics = await page.evaluate(() => {
-    const preview = document.querySelector(".preview-panel")?.getBoundingClientRect();
-    const rail = document.querySelector(".artifact-rail")?.getBoundingClientRect();
+    const sidebar = document.querySelector(".sidebar");
 
     return {
       title: document.querySelector("h1")?.textContent ?? "",
       bodyWidth: document.body.scrollWidth,
       viewportWidth: window.innerWidth,
-      visiblePanels: document.querySelectorAll(".panel").length,
-      artifactItems: document.querySelectorAll(".artifact-item").length,
-      horizontalOverflow: document.body.scrollWidth > window.innerWidth + 1,
-      previewRailGap:
-        preview && rail && window.innerWidth >= 1180 ? Math.round(rail.left - preview.right) : null
+      navItems: document.querySelectorAll(".nav-item").length,
+      quickChips: document.querySelectorAll(".quick-chip").length,
+      composerVisible: Boolean(document.querySelector(".composer-card")),
+      workspaceVisible: Boolean(document.querySelector(".workspace-picker")),
+      sidebarVisible: sidebar ? getComputedStyle(sidebar).display !== "none" : false,
+      horizontalOverflow: document.body.scrollWidth > window.innerWidth + 1
     };
   });
 
@@ -73,20 +73,20 @@ async function inspectViewport(browser, target) {
     fail(`Unexpected title for ${target.name}: ${metrics.title}`);
   }
 
-  if (metrics.artifactItems !== 4) {
-    fail(`Expected 4 artifact items for ${target.name}, saw ${metrics.artifactItems}.`);
+  if (target.width >= 820 && metrics.navItems !== 6) {
+    fail(`Expected 6 sidebar nav items for ${target.name}, saw ${metrics.navItems}.`);
   }
 
-  if (metrics.visiblePanels < 7) {
-    fail(`Expected at least 7 panels for ${target.name}, saw ${metrics.visiblePanels}.`);
+  if (metrics.quickChips < 8) {
+    fail(`Expected at least 8 quick chips for ${target.name}, saw ${metrics.quickChips}.`);
+  }
+
+  if (!metrics.composerVisible || !metrics.workspaceVisible) {
+    fail(`Composer or workspace picker missing for ${target.name}.`);
   }
 
   if (metrics.horizontalOverflow) {
     fail(`Detected horizontal overflow for ${target.name}.`);
-  }
-
-  if (metrics.previewRailGap !== null && metrics.previewRailGap < 10) {
-    fail(`Preview and artifact rail are too close for ${target.name}: ${metrics.previewRailGap}px.`);
   }
 
   if (!existsSync(target.path)) {
