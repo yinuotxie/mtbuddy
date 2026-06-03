@@ -1,8 +1,13 @@
 __pycache__/
 *.py[cod]
+*.tsbuildinfo
 .pytest_cache/
 .venv/
 dist/
 build/
 *.egg-info/
 workspaces/*/artifacts/
+node_modules/
+apps/*/dist/
+apps/*/.vite/
+apps/*/src-tauri/target/

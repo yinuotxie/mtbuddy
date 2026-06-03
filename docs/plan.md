@@ -32,6 +32,8 @@ AIBOOK hardware:
   be abstracted behind a provider interface.
 - DeepSeek is the near-term cloud model provider while AIBOOK hardware is not
   available.
+- The first workstation UI is a Tauri-ready React mock because Rust/Cargo are
+  not installed in the current worktree environment.
 
 ## Architecture Direction
 
@@ -257,6 +259,24 @@ the proof workflow.
 - Risk: app looks like a generic assistant.
   - Mitigation: emphasize execution timeline, local artifacts, eval metrics, and
     AIBOOK/AIOS compatibility in docs and demo.
+
+## Workstation UI Slice
+
+The first UI slice lives in `apps/workstation-ui` and is intentionally a mock:
+it shows the product shape without requiring Tauri runtime wiring yet.
+
+It should make these ideas obvious in the first viewport:
+
+- MTBUDDY is a workstation around local workspaces, not a generic chat app.
+- `LocalExecutor` remains the deterministic/offline path.
+- MTClaw is the OpenAI-compatible function-router bridge.
+- OpenClaw is the flagship competition agent path, while other compatible
+  agents can use the same provider surface.
+- Artifacts and audit logs are first-class outputs.
+
+The next UI implementation wave should connect this shell to a local backend
+process that invokes the existing Python core, streams timeline events, and
+opens generated artifacts from the workspace artifact directory.
 
 - Risk: too many skills, none complete.
   - Mitigation: first demo uses only file, doc, sheet, and audit.

@@ -37,6 +37,7 @@ the Tauri desktop UI is built.
 - Direct MTClaw Function Router client.
 - MTClaw Function Router tool definitions and wrapper scripts.
 - End-to-end pytest coverage for the CLI and MTClaw tool entrypoint.
+- Tauri-ready React workstation UI mock under `apps/workstation-ui`.
 
 ## Setup
 
@@ -85,6 +86,34 @@ python -m pytest
 The test suite copies the demo workspace to a temp directory, runs the real CLI,
 and verifies the report sections, action CSV, and audit operations.
 
+## Workstation UI Mock
+
+The first desktop UI pass is a Tauri-ready React mock. It runs in the browser
+today and keeps the Tauri wrapper scaffold in place for Linux packaging once
+Rust/Cargo and the Tauri system prerequisites are installed.
+
+```bash
+cd apps/workstation-ui
+npm install
+npm run dev
+```
+
+Build the UI mock:
+
+```bash
+cd apps/workstation-ui
+npm run build
+npm run test:smoke
+```
+
+The desktop shell commands are present, but not verified in this worktree
+because `rustc` and `cargo` are not installed:
+
+```bash
+npm run tauri:dev
+npm run tauri:build
+```
+
 ## OpenAI-Compatible Agents And MTClaw
 
 Automated tests use `--executor local` so they do not require OpenClaw, MTClaw,
@@ -127,3 +156,4 @@ for the manual DeepSeek/Function Router setup path.
 
 - [Project plan](docs/plan.md)
 - [OpenAI-compatible agents and MTClaw integration](docs/openclaw-mtclaw.md)
+- [Workstation UI mock](docs/workstation-ui.md)
