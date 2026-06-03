@@ -68,3 +68,12 @@ Use DeepSeek as both routing and upstream while we do not have AIBOOK hardware:
 
 The model/provider details live in Function Router config, not in these wrapper
 scripts. The wrappers only expose deterministic local MTBUDDY tools.
+
+## PPTX Tools
+
+This integration includes a first PPTX capability pack:
+
+- `mtbuddy_pptx_create_from_outline`
+- `mtbuddy_pptx_read_text`
+
+The companion skill playbook lives at `skills/pptx/SKILL.md`.

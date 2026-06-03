@@ -13,6 +13,7 @@ from .core.workflow import analyze_allowed_sources, create_audit_log
 from .core.workspace import resolve_workspace
 from .skills.doc_skill import DocSkill
 from .skills.file_skill import FileSkill
+from .skills.pptx_skill import PptxSkill
 from .skills.sheet_skill import SheetSkill
 
 
@@ -23,6 +24,8 @@ LIST_FILES_TOOL = "mtbuddy_list_files"
 READ_FILE_TOOL = "mtbuddy_read_file"
 GENERATE_REPORT_TOOL = "mtbuddy_generate_report"
 WRITE_ACTION_CSV_TOOL = "mtbuddy_write_action_csv"
+PPTX_CREATE_FROM_OUTLINE_TOOL = "mtbuddy_pptx_create_from_outline"
+PPTX_READ_TEXT_TOOL = "mtbuddy_pptx_read_text"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -114,6 +117,31 @@ def _write_action_csv(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _pptx_create_from_outline(payload: dict[str, Any]) -> dict[str, Any]:
+    workspace, audit = _workspace_and_audit(payload)
+    outline_path = str(payload.get("outline_path") or "")
+    if not outline_path:
+        raise ValueError("missing outline_path")
+    output_name = str(payload.get("output_name") or "presentation.pptx")
+    title = payload.get("title")
+    artifact_store = WorkspaceArtifactStore(workspace, audit)
+    pptx_path = PptxSkill(workspace, artifact_store, audit).create_from_outline(
+        workspace / outline_path,
+        output_name=output_name,
+        title=str(title) if title else None,
+    )
+    return {"result": "ok", "presentation": str(pptx_path)}
+
+
+def _pptx_read_text(payload: dict[str, Any]) -> dict[str, Any]:
+    workspace, audit = _workspace_and_audit(payload)
+    path = str(payload.get("path") or "")
+    if not path:
+        raise ValueError("missing path")
+    artifact_store = WorkspaceArtifactStore(workspace, audit)
+    return PptxSkill(workspace, artifact_store, audit).read_text(workspace / path)
+
+
 def _workspace_and_audit(payload: dict[str, Any]):
     workspace = resolve_workspace(_workspace_from(payload))
     return workspace, create_audit_log(workspace)
@@ -137,6 +165,8 @@ TOOL_HANDLERS: dict[str, ToolHandler] = {
     READ_FILE_TOOL: _read_file,
     GENERATE_REPORT_TOOL: _generate_report,
     WRITE_ACTION_CSV_TOOL: _write_action_csv,
+    PPTX_CREATE_FROM_OUTLINE_TOOL: _pptx_create_from_outline,
+    PPTX_READ_TEXT_TOOL: _pptx_read_text,
 }
 
 

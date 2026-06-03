@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "MTBUDDY contributors" }]
-dependencies = []
+dependencies = ["python-pptx>=1.0.2"]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]

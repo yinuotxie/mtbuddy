@@ -62,6 +62,9 @@ class ArtifactStore(Protocol):
     def write_text(self, relative_path: str, content: str) -> Path:
         """Write a UTF-8 artifact and return its path."""
 
+    def write_bytes(self, relative_path: str, content: bytes) -> Path:
+        """Write a binary artifact and return its path."""
+
 
 class Skill(Protocol):
     """A deterministic, auditable MTBUDDY capability."""

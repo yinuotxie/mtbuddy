@@ -106,5 +106,6 @@ def test_mtclaw_tool_entrypoint_lists_workspace_files(tmp_path: Path) -> None:
     assert {item["path"] for item in payload["files"]} == {
         "meeting-notes.md",
         "metrics.csv",
+        "presentation-outline.md",
         "research-notes.txt",
     }

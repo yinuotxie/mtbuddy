@@ -28,6 +28,8 @@ the Tauri desktop UI is built.
 - Core interfaces for `Skill`, `Executor`, `ArtifactStore`, `AuditLog`, and
   `LLMProvider`.
 - Deterministic `file_skill`, `doc_skill`, and `sheet_skill`.
+- Deterministic `pptx_skill` for creating a `.pptx` from a Markdown outline
+  and reading slide text back for content QA.
 - Local artifact output under `<workspace>/artifacts/`.
 - Append-only JSONL audit log for every operation.
 - OpenAI-compatible agent client abstraction.
@@ -57,6 +59,14 @@ Expected artifacts:
 workspaces/demo/artifacts/report.md
 workspaces/demo/artifacts/action-items.csv
 workspaces/demo/artifacts/audit.jsonl
+```
+
+Create a PowerPoint artifact from the demo outline through the MTClaw tool
+entrypoint:
+
+```bash
+printf '%s' '{"workspace":"./workspaces/demo","outline_path":"presentation-outline.md"}' \
+  | python -m mtbuddy.mtclaw_tools mtbuddy_pptx_create_from_outline
 ```
 
 Use JSON output for automation:
@@ -107,6 +117,7 @@ MTClaw integration assets live in:
 ```text
 integrations/mtclaw/functions.jsonl
 integrations/mtclaw/scripts/
+skills/pptx/SKILL.md
 ```
 
 See [OpenAI-Compatible Agents And MTClaw Integration](docs/openclaw-mtclaw.md)
